@@ -1,0 +1,9 @@
+{
+  "incident_id": "INC-2026-001",
+  "title": "Production API returning HTTP 500 errors",
+  "service": "checkout-api",
+  "severity": "high",
+  "started_at": "2026-09-15T14:32:00Z",
+  "ended_at": "2026-09-15T15:07:00Z",
+  "summary": "The checkout API began returning HTTP 500 responses shortly after a production deployment."
+}

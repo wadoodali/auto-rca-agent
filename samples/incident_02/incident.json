@@ -1,0 +1,9 @@
+{
+  "incident_id": "INC-2026-002",
+  "title": "Production order API latency spike",
+  "service": "order-api",
+  "severity": "medium",
+  "started_at": "2026-09-22T09:17:00Z",
+  "ended_at": "2026-09-22T10:03:00Z",
+  "summary": "The order API experienced a significant latency increase after a production deployment, causing elevated request timeouts."
+}

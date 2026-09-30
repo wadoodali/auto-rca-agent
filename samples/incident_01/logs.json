@@ -1,0 +1,93 @@
+[
+  {
+    "timestamp": "2026-09-15T14:28:11Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "message": "Deployment checkout-api version 2026.09.15.3 completed successfully."
+  },
+  {
+    "timestamp": "2026-09-15T14:32:04Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "message": "HTTP 500 while processing checkout request.",
+    "request_id": "req-8f21"
+  },
+  {
+    "timestamp": "2026-09-15T14:32:05Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "message": "Database connection acquisition timed out after 5000ms.",
+    "request_id": "req-8f21"
+  },
+  {
+    "timestamp": "2026-09-15T14:33:17Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "message": "Database connection pool utilization reached 92%."
+  },
+  {
+    "timestamp": "2026-09-15T14:35:42Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "message": "Database connection acquisition timed out after 5000ms.",
+    "request_id": "req-a91c"
+  },
+  {
+    "timestamp": "2026-09-15T14:37:10Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "message": "Database connection pool utilization reached 100%."
+  },
+  {
+    "timestamp": "2026-09-15T14:38:02Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "message": "HTTP 500 while processing checkout request.",
+    "request_id": "req-c731"
+  },
+  {
+    "timestamp": "2026-09-15T14:41:26Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "message": "Request latency exceeded 3000ms for POST /checkout.",
+    "request_id": "req-d442"
+  },
+  {
+    "timestamp": "2026-09-15T14:45:03Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "message": "Database connection acquisition timed out after 5000ms.",
+    "request_id": "req-f118"
+  },
+  {
+    "timestamp": "2026-09-15T14:49:51Z",
+    "level": "WARN",
+    "service": "checkout-api",
+    "message": "Database pool contains 30 active connections and 0 idle connections."
+  },
+  {
+    "timestamp": "2026-09-15T14:54:19Z",
+    "level": "ERROR",
+    "service": "checkout-api",
+    "message": "HTTP 500 while processing checkout request.",
+    "request_id": "req-b820"
+  },
+  {
+    "timestamp": "2026-09-15T15:01:44Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "message": "Traffic shifted to previous application version as part of incident mitigation."
+  },
+  {
+    "timestamp": "2026-09-15T15:05:12Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "message": "Database connection pool utilization dropped to 41%."
+  },
+  {
+    "timestamp": "2026-09-15T15:07:03Z",
+    "level": "INFO",
+    "service": "checkout-api",
+    "message": "HTTP 500 error rate returned to baseline."
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "deployment_id": "deploy-2026-09-22-002",
+    "timestamp": "2026-09-22T09:12:08Z",
+    "service": "order-api",
+    "environment": "production",
+    "version": "2026.09.22.2",
+    "commit_hash": "f31ab82",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-22-003",
+    "timestamp": "2026-09-22T09:54:26Z",
+    "service": "order-api",
+    "environment": "production",
+    "version": "2026.09.21.7",
+    "commit_hash": "d91ac44",
+    "status": "rollback"
+  }
+]

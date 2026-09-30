@@ -1,0 +1,20 @@
+[
+  {
+    "deployment_id": "deploy-2026-09-15-003",
+    "timestamp": "2026-09-15T14:28:11Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.09.15.3",
+    "commit_hash": "a13f9c2",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-15-004",
+    "timestamp": "2026-09-15T15:01:44Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.09.14.8",
+    "commit_hash": "e82bc11",
+    "status": "rollback"
+  }
+]
