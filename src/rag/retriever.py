@@ -1,4 +1,3 @@
-from src.rag.models import RetrievedEvidence
 from src.rag.vector_store import create_vector_store, search_documents
 from src.rag.models import RetrievedEvidence, RetrievalConfig
 
@@ -24,10 +23,12 @@ def retrieve_evidence(
         source_type=source_type,
     )
     evidence = [
-        RetrievedEvidence(**result)
-        for result in results
-    ]
-
+    RetrievedEvidence(
+        **result,
+        incident_id=incident_id,
+    )
+    for result in results
+]
     if config.max_distance is not None:
         evidence = [
             item

@@ -5,6 +5,7 @@ class RetrievedEvidence(BaseModel):
     """Represents evidence returned by semantic retrieval."""
     content: str
     source_type: str
+    incident_id: str
     source_id: str
     distance: float
 
