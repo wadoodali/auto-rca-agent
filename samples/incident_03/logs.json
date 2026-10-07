@@ -1,0 +1,135 @@
+[
+  {
+    "timestamp": "2026-09-30T23:55:00Z",
+    "service": "auth-service",
+    "level": "INFO",
+    "message": "Authentication service operating normally."
+  },
+  {
+    "timestamp": "2026-09-30T23:58:00Z",
+    "service": "certificate-monitor",
+    "level": "WARN",
+    "message": "Certificate auth.internal.example.com expires in 2 minutes."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:00Z",
+    "service": "certificate-monitor",
+    "level": "ERROR",
+    "message": "Certificate auth.internal.example.com expired at 2026-10-01T00:00:00Z."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:01Z",
+    "service": "auth-service",
+    "level": "ERROR",
+    "message": "TLS handshake failed: certificate has expired for auth.internal.example.com."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:02Z",
+    "service": "auth-service",
+    "level": "ERROR",
+    "message": "Authentication request failed while connecting to auth.internal.example.com."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:05Z",
+    "service": "auth-service",
+    "level": "WARN",
+    "message": "Authentication failure rate increased to 18%."
+  },
+  {
+    "timestamp": "2026-10-01T00:01:00Z",
+    "service": "auth-service",
+    "level": "ERROR",
+    "message": "TLS certificate verification failed for auth.internal.example.com."
+  },
+  {
+    "timestamp": "2026-10-01T00:03:00Z",
+    "service": "auth-service",
+    "level": "ERROR",
+    "message": "Authentication failure rate increased to 47%."
+  },
+  {
+    "timestamp": "2026-10-01T00:05:00Z",
+    "service": "auth-service",
+    "level": "ERROR",
+    "message": "Authentication failure rate increased to 82%."
+  },
+  {
+    "timestamp": "2026-10-01T00:10:00Z",
+    "service": "auth-service",
+    "level": "ERROR",
+    "message": "Authentication failures remain elevated; TLS certificate validation errors detected."
+  },
+
+  {
+    "timestamp": "2026-09-30T23:59:58Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_START database=auth-db."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:00Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_START database=auth-db."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:01Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_START database=users-db."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:02Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_START database=sessions-db."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:03Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_START database=permissions-db."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:05Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_PROGRESS completed=25%."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:08Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_PROGRESS completed=50%."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:12Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_PROGRESS completed=75%."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:18Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_COMPLETE database=auth-db status=success."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:20Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_COMPLETE database=users-db status=success."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:22Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_COMPLETE database=sessions-db status=success."
+  },
+  {
+    "timestamp": "2026-10-01T00:00:24Z",
+    "service": "backup-service",
+    "level": "INFO",
+    "message": "DB_BACKUP_COMPLETE database=permissions-db status=success."
+  }
+]

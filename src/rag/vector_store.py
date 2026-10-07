@@ -22,7 +22,7 @@ def create_vector_store() -> chromadb.Collection:
 def add_documents(collection: chromadb.Collection, documents: list[EvidenceDocument],) -> None:
     """Add evidence documents to the ChromaDB collection."""
 
-    collection.add(
+    collection.upsert(
         ids=[
             f"{document.incident_id}:{document.source_type}:{index}"
             for index, document in enumerate(documents)

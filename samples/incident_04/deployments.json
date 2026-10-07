@@ -1,0 +1,29 @@
+[
+  {
+    "deployment_id": "deploy-2026-09-28-001",
+    "timestamp": "2026-09-28T09:00:00Z",
+    "service": "image-service",
+    "environment": "production",
+    "version": "2026.09.28.2",
+    "commit_hash": "b72c91e",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-29-002",
+    "timestamp": "2026-09-29T11:30:00Z",
+    "service": "image-service",
+    "environment": "production",
+    "version": "2026.09.29.3",
+    "commit_hash": "4d82a11",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-30-003",
+    "timestamp": "2026-09-30T16:45:00Z",
+    "service": "image-service",
+    "environment": "production",
+    "version": "2026.09.30.4",
+    "commit_hash": "9ac31f0",
+    "status": "success"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "incident_id": "INC-2026-005",
+  "title": "Checkout payment failures caused by third-party payment provider outage",
+  "service": "checkout-api",
+  "environment": "production",
+  "severity": "high",
+  "start_time": "2026-10-05T09:17:00Z",
+  "end_time": "2026-10-05T09:43:00Z",
+  "description": "The checkout API experienced a sharp increase in payment transaction failures. The incident was caused by an external Stripe API outage returning HTTP 503 responses. A recent internal deployment occurred shortly before the incident but did not modify payment-processing logic.",
+  "root_cause_category": "third_party_payment_provider_outage",
+  "expected_consequence": "payment_transaction_failures"
+}

@@ -1,5 +1,5 @@
 from tests.evaluation.deterministic.evaluator import evaluate_incident_report
-from tests.evaluation.deterministic.expected_incidents import (INCIDENT_001_EXPECTATION, INCIDENT_002_EXPECTATION)
+from tests.evaluation.deterministic.expected_incidents import (INCIDENT_001_EXPECTATION, INCIDENT_002_EXPECTATION, INCIDENT_003_EXPECTATION)
 from src.schemas.incident import IncidentReport
 
 def test_valid_incident_report_passes_deterministic_evaluation() -> None:
@@ -112,4 +112,27 @@ def test_incident_002_report_passes_deterministic_evaluation() -> None:
         report=report,
         expectation=INCIDENT_002_EXPECTATION,
     )
+    assert failures == []
+
+def test_incident_003_report_passes_deterministic_evaluation() -> None:
+    """Verify that an SSL certificate incident passes deterministic evaluation."""
+
+    report = IncidentReport(
+        likely_cause=(
+            "The auth-service certificate expired at midnight, "
+            "causing TLS validation failures and authentication failures."
+        ),
+        evidence=[
+            "The certificate expired at 2026-10-01T00:00:00Z.",
+            "TLS handshake failures began immediately afterward.",
+        ],
+        confidence=0.95,
+        suggested_remediation="Renew the expired internal SSL certificate.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_003_EXPECTATION,
+    )
+
     assert failures == []

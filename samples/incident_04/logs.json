@@ -1,0 +1,110 @@
+[
+  {
+    "timestamp": "2026-09-28T09:00:00Z",
+    "service": "image-service",
+    "level": "INFO",
+    "message": "Image-service deployed successfully with version 2026.09.28.2."
+  },
+  {
+    "timestamp": "2026-09-28T10:15:00Z",
+    "service": "image-service",
+    "level": "INFO",
+    "message": "Image processing worker memory usage: 61%."
+  },
+  {
+    "timestamp": "2026-09-28T18:30:00Z",
+    "service": "image-service",
+    "level": "INFO",
+    "message": "Image processing worker memory usage: 66%."
+  },
+  {
+    "timestamp": "2026-09-29T06:45:00Z",
+    "service": "image-service",
+    "level": "INFO",
+    "message": "Image processing worker memory usage: 71%."
+  },
+  {
+    "timestamp": "2026-09-29T14:20:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 76%."
+  },
+  {
+    "timestamp": "2026-09-29T22:10:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 79%."
+  },
+  {
+    "timestamp": "2026-09-30T05:30:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 82%."
+  },
+  {
+    "timestamp": "2026-09-30T12:15:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 86%."
+  },
+  {
+    "timestamp": "2026-09-30T19:40:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 89%."
+  },
+  {
+    "timestamp": "2026-10-01T08:00:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 92%."
+  },
+  {
+    "timestamp": "2026-10-01T13:45:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 95%."
+  },
+  {
+    "timestamp": "2026-10-01T13:59:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 97%."
+  },
+  {
+    "timestamp": "2026-10-01T14:00:00Z",
+    "service": "image-service",
+    "level": "INFO",
+    "message": "Traffic increased by 240% due to a marketing campaign."
+  },
+  {
+    "timestamp": "2026-10-01T14:02:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Image processing worker memory usage reached 99% during increased traffic."
+  },
+  {
+    "timestamp": "2026-10-01T14:05:00Z",
+    "service": "image-service",
+    "level": "ERROR",
+    "message": "Image processing worker terminated: out-of-memory condition."
+  },
+  {
+    "timestamp": "2026-10-01T14:05:02Z",
+    "service": "image-service",
+    "level": "ERROR",
+    "message": "Container restarted after exceeding memory limit."
+  },
+  {
+    "timestamp": "2026-10-01T14:06:00Z",
+    "service": "image-service",
+    "level": "WARN",
+    "message": "Memory usage remained above 90% after restart."
+  },
+  {
+    "timestamp": "2026-10-01T14:10:00Z",
+    "service": "image-service",
+    "level": "INFO",
+    "message": "Traffic returned toward normal levels, but memory usage continued to increase."
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "commit_hash": "4c82f11",
+    "timestamp": "2026-09-29T09:14:22Z",
+    "author": "cart-team",
+    "message": "Fix cart quantity validation",
+    "files_changed": [
+      "cart/validation.py"
+    ],
+    "diff": "- cart items were accepted without enforcing minimum quantity\n+ added validation rejecting quantities below 1\n+ added explicit invalid-cart response"
+  },
+  {
+    "commit_hash": "b71e3c8",
+    "timestamp": "2026-10-04T15:22:51Z",
+    "author": "checkout-team",
+    "message": "Refactor checkout cart response handling",
+    "files_changed": [
+      "checkout/cart_response.py",
+      "checkout/models.py"
+    ],
+    "diff": "- simplified checkout response handling\n+ changed response model mapping\n+ no change to cart quantity validation"
+  },
+  {
+    "commit_hash": "e51a9d4",
+    "timestamp": "2026-10-06T08:41:17Z",
+    "author": "integration-team",
+    "message": "Merge checkout refactor and resolve cart validation conflict",
+    "files_changed": [
+      "cart/validation.py",
+      "checkout/cart_response.py"
+    ],
+    "diff": "- merge conflict resolved by keeping the older validation.py version\n- removed minimum-quantity validation introduced by 4c82f11\n+ preserved checkout response changes from b71e3c8\n+ resulting validation.py no longer rejects quantities below 1"
+  },
+  {
+    "commit_hash": "f902ab7",
+    "timestamp": "2026-10-06T10:42:31Z",
+    "author": "oncall",
+    "message": "Rollback cart validation regression",
+    "files_changed": [
+      "cart/validation.py"
+    ],
+    "diff": "- reverted the merge-conflict resolution from e51a9d4\n+ restored minimum-quantity validation from 4c82f11"
+  }
+]

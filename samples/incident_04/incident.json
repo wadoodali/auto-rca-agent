@@ -1,0 +1,9 @@
+{
+  "incident_id": "INC-2026-004",
+  "title": "Image service out-of-memory crash",
+  "service": "image-service",
+  "severity": "critical",
+  "started_at": "2026-10-01T14:05:00Z",
+  "ended_at": null,
+  "description": "The image-service experienced gradual memory growth over several days and eventually crashed with an out-of-memory error."
+}

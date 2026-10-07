@@ -30,6 +30,13 @@ def evaluate_investigation_trajectory(
             "the root cause, avoid unnecessary or redundant investigation steps, "
             "and reach its conclusion only after gathering appropriate evidence."
         ),
+        evaluation_steps=[
+            "Check whether the agent used tools relevant to the incident and the investigation query.",
+            "Check whether the agent gathered sufficient evidence before reaching its conclusion.",
+            "Check whether each major investigation step contributed meaningful information toward the root cause.",
+            "Check whether the agent avoided unnecessary or redundant tool calls.",
+            "Check whether the final conclusion was supported by the evidence gathered during the investigation.",
+        ],
         rubric=[
             Rubric(
                 score_range=(0, 2),

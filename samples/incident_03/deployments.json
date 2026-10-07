@@ -1,0 +1,29 @@
+[
+  {
+    "deployment_id": "deploy-2026-09-26-001",
+    "timestamp": "2026-09-26T11:02:15Z",
+    "service": "auth-service",
+    "environment": "production",
+    "version": "2026.09.26.1",
+    "commit_hash": "7e4a21c",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-27-002",
+    "timestamp": "2026-09-27T16:05:41Z",
+    "service": "auth-service",
+    "environment": "production",
+    "version": "2026.09.27.2",
+    "commit_hash": "2b91fd4",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-28-001",
+    "timestamp": "2026-09-28T10:01:27Z",
+    "service": "auth-service",
+    "environment": "production",
+    "version": "2026.09.28.1",
+    "commit_hash": "91c7ab2",
+    "status": "success"
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "incident_id": "INC-2026-003",
+  "title": "Authentication failures after midnight",
+  "service": "auth-service",
+  "severity": "high",
+  "started_at": "2026-10-01T00:00:01Z",
+  "ended_at": null,
+  "description": "Authentication failures began immediately after midnight."
+}

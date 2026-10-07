@@ -1,0 +1,29 @@
+[
+  {
+    "deployment_id": "deploy-2026-10-05-001",
+    "timestamp": "2026-10-05T08:45:00Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.10.05.1",
+    "commit_hash": "c84d2e1",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-10-02-004",
+    "timestamp": "2026-10-02T14:35:00Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.10.02.3",
+    "commit_hash": "7f21ab4",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-28-002",
+    "timestamp": "2026-09-28T11:25:00Z",
+    "service": "checkout-api",
+    "environment": "production",
+    "version": "2026.09.28.2",
+    "commit_hash": "91c5ef0",
+    "status": "success"
+  }
+]

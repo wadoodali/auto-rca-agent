@@ -1,0 +1,38 @@
+[
+  {
+    "deployment_id": "deploy-2026-10-06-001",
+    "timestamp": "2026-10-06T08:55:00Z",
+    "service": "cart-api",
+    "environment": "production",
+    "version": "2026.10.06.1",
+    "commit_hash": "e51a9d4",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-10-04-003",
+    "timestamp": "2026-10-04T15:40:00Z",
+    "service": "cart-api",
+    "environment": "production",
+    "version": "2026.10.04.3",
+    "commit_hash": "b71e3c8",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-09-29-002",
+    "timestamp": "2026-09-29T09:35:00Z",
+    "service": "cart-api",
+    "environment": "production",
+    "version": "2026.09.29.2",
+    "commit_hash": "4c82f11",
+    "status": "success"
+  },
+  {
+    "deployment_id": "deploy-2026-10-06-002",
+    "timestamp": "2026-10-06T10:44:00Z",
+    "service": "cart-api",
+    "environment": "production",
+    "version": "2026.10.06.2",
+    "commit_hash": "f902ab7",
+    "status": "success"
+  }
+]

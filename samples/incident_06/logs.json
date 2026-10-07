@@ -1,0 +1,72 @@
+[
+  {
+    "timestamp": "2026-10-06T10:05:14Z",
+    "level": "INFO",
+    "service": "cart-api",
+    "message": "Cart validation operating normally",
+    "request_id": "req-601"
+  },
+  {
+    "timestamp": "2026-10-06T10:12:03Z",
+    "level": "ERROR",
+    "service": "cart-api",
+    "message": "Invalid cart state accepted: item quantity below minimum",
+    "request_id": "req-742"
+  },
+  {
+    "timestamp": "2026-10-06T10:14:27Z",
+    "level": "ERROR",
+    "service": "cart-api",
+    "message": "Checkout rejected because cart contains invalid item state",
+    "request_id": "req-761"
+  },
+  {
+    "timestamp": "2026-10-06T10:16:42Z",
+    "level": "WARN",
+    "service": "cart-api",
+    "message": "Cart validation failure rate increased to 18 percent",
+    "request_id": "req-774"
+  },
+  {
+    "timestamp": "2026-10-06T10:19:11Z",
+    "level": "ERROR",
+    "service": "cart-api",
+    "message": "Cart accepted item with quantity 0 after validation",
+    "request_id": "req-801"
+  },
+  {
+    "timestamp": "2026-10-06T10:23:35Z",
+    "level": "ERROR",
+    "service": "cart-api",
+    "message": "Checkout request failed due to invalid cart state",
+    "request_id": "req-823"
+  },
+  {
+    "timestamp": "2026-10-06T10:28:09Z",
+    "level": "ERROR",
+    "service": "cart-api",
+    "message": "Multiple carts contain items below minimum quantity",
+    "request_id": "req-847"
+  },
+  {
+    "timestamp": "2026-10-06T10:34:52Z",
+    "level": "WARN",
+    "service": "cart-api",
+    "message": "Invalid cart state rate reached 31 percent",
+    "request_id": "req-882"
+  },
+  {
+    "timestamp": "2026-10-06T10:41:16Z",
+    "level": "INFO",
+    "service": "cart-api",
+    "message": "Rollback completed; cart validation failures decreasing",
+    "request_id": "req-914"
+  },
+  {
+    "timestamp": "2026-10-06T10:47:03Z",
+    "level": "INFO",
+    "service": "cart-api",
+    "message": "Cart validation failure rate returned to baseline",
+    "request_id": "req-931"
+  }
+]
