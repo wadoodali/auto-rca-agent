@@ -28,5 +28,8 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
+      - name: Seed ChromaDB
+        run: python scripts/seed_samples.py
+
       - name: Run semantic evaluation
         run: python -m pytest tests/evaluation/semantic -q
