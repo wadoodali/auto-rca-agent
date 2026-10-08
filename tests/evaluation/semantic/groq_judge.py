@@ -4,7 +4,7 @@ from typing import Any
 from deepeval.models.base_model import DeepEvalBaseLLM
 from openai import AsyncOpenAI, OpenAI, RateLimitError
 from pydantic import BaseModel
-from pydantic import BaseModel
+
 
 class JudgeUnavailableError(RuntimeError):
     """Raised when the external evaluation judge cannot be used."""

@@ -194,6 +194,11 @@ def test_agent_investigation_is_faithful(
             faithfulness_test_case,
         )
 
+        print(
+            f"Faithfulness score: "
+            f"{faithfulness_metric.score:.3f}"
+        )
+
         assert faithfulness_metric.is_successful(), (
             f"Faithfulness evaluation failed for {incident_id}."
         )
