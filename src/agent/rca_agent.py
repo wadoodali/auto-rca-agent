@@ -55,11 +55,36 @@ def _tool_call_signature(tool_call: Any) -> tuple[str, str]:
 def execute_requested_tools(
     tool_calls: list[Any],
     seen_tool_calls: set[tuple[str, str]],
+    investigation_id: str,
 ) -> list[tuple[Any, list[dict[str, Any]]]]:
     """Execute all tools requested by the LLM."""
 
     results = []
     for tool_call in tool_calls:
+        try:
+            parsed_arguments = json.loads(tool_call.arguments)
+        except (TypeError, ValueError):
+            parsed_arguments = None
+
+        if (
+            isinstance(parsed_arguments, dict)
+            and set(parsed_arguments) == {"incident_id", "query"}
+            and isinstance(parsed_arguments.get("incident_id"), str)
+            and isinstance(parsed_arguments.get("query"), str)
+            and parsed_arguments["incident_id"].strip()
+            and parsed_arguments["query"].strip()
+            and parsed_arguments["incident_id"] != investigation_id
+        ):
+            result = [{
+                "error": (
+                    "Tool call incident_id does not match "
+                    "the investigation incident."
+                ),
+                "tool_name": tool_call.name,
+            }]
+            results.append((tool_call, result))
+            continue
+
         signature = _tool_call_signature(tool_call)
         if signature in seen_tool_calls:
             result = [{
@@ -105,11 +130,16 @@ def continue_investigation(response: Any, tool_outputs: list[dict[str, str]],) -
 def run_investigation_round(
     response: Any,
     seen_tool_calls: set[tuple[str, str]],
+    investigation_id: str,
 ) -> tuple[Any, list[tuple[Any, list[dict[str, Any]]]]]:
     """Execute requested tools and continue the investigation."""
 
     tool_calls = extract_tool_calls(response)
-    tool_results = execute_requested_tools(tool_calls, seen_tool_calls)
+    tool_results = execute_requested_tools(
+        tool_calls,
+        seen_tool_calls,
+        investigation_id,
+    )
     tool_outputs = format_tool_results(tool_results)
 
     next_response = continue_investigation(response=response, tool_outputs=tool_outputs)
@@ -207,6 +237,7 @@ def run_investigation(incident_id: str, investigation_query: str) -> Investigati
         response, tool_results = run_investigation_round(
             response,
             seen_tool_calls,
+            incident_id,
         )
         execution_trace.extend(tool_results)
         execution_trace_rounds.extend([round_number] * len(tool_results))
