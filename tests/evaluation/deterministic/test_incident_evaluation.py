@@ -1,5 +1,12 @@
 from tests.evaluation.deterministic.evaluator import evaluate_incident_report
-from tests.evaluation.deterministic.expected_incidents import (INCIDENT_001_EXPECTATION, INCIDENT_002_EXPECTATION, INCIDENT_003_EXPECTATION)
+from tests.evaluation.deterministic.expected_incidents import (
+    INCIDENT_001_EXPECTATION,
+    INCIDENT_002_EXPECTATION,
+    INCIDENT_003_EXPECTATION,
+    INCIDENT_004_EXPECTATION,
+    INCIDENT_005_EXPECTATION,
+    INCIDENT_006_EXPECTATION,
+)
 from src.schemas.incident import IncidentReport
 
 def test_valid_incident_report_passes_deterministic_evaluation() -> None:
@@ -136,3 +143,121 @@ def test_incident_003_report_passes_deterministic_evaluation() -> None:
     )
 
     assert failures == []
+
+
+def test_incident_004_report_passes_deterministic_evaluation() -> None:
+    """Verify that a correct memory-leak RCA passes evaluation."""
+
+    report = IncidentReport(
+        likely_cause=(
+            "Commit b72c91e introduced a memory leak causing gradual memory "
+            "growth and eventual out-of-memory failure."
+        ),
+        evidence=["Memory usage increased steadily after deployment."],
+        confidence=0.95,
+        suggested_remediation="Fix the memory leak and redeploy safely.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_004_EXPECTATION,
+    )
+
+    assert failures == []
+
+
+def test_incident_004_report_rejects_wrong_commit() -> None:
+    """Verify that an incorrect commit fails for incident 004."""
+
+    report = IncidentReport(
+        likely_cause="A memory leak caused gradual memory growth and OOM.",
+        evidence=["Memory usage increased steadily after deployment."],
+        confidence=0.95,
+        suggested_remediation="Fix the memory leak.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_004_EXPECTATION,
+    )
+
+    assert failures
+    assert any("introducing commit" in failure.lower() for failure in failures)
+
+
+def test_incident_005_report_passes_without_introducing_commit() -> None:
+    """Verify that incident 005 only requires sufficient confidence."""
+
+    report = IncidentReport(
+        likely_cause="The third-party payment provider experienced an outage.",
+        evidence=["Payment provider requests failed during the incident."],
+        confidence=0.95,
+        suggested_remediation="Use the provider recovery and failover procedure.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_005_EXPECTATION,
+    )
+
+    assert failures == []
+
+
+def test_incident_006_report_passes_deterministic_evaluation() -> None:
+    """Verify that a correct cart API RCA passes evaluation."""
+
+    report = IncidentReport(
+        likely_cause=(
+            "Commit e51a9d4 accidentally reintroduced a previously fixed "
+            "validation bug, causing invalid cart states."
+        ),
+        evidence=["Invalid cart states appeared after the deployment."],
+        confidence=0.95,
+        suggested_remediation="Restore the fixed validation logic.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_006_EXPECTATION,
+    )
+
+    assert failures == []
+
+
+def test_incident_006_report_rejects_wrong_commit() -> None:
+    """Verify that an incorrect commit fails for incident 006."""
+
+    report = IncidentReport(
+        likely_cause="A validation bug caused invalid cart states.",
+        evidence=["Invalid cart states appeared after the deployment."],
+        confidence=0.95,
+        suggested_remediation="Restore the fixed validation logic.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_006_EXPECTATION,
+    )
+
+    assert failures
+    assert any("introducing commit" in failure.lower() for failure in failures)
+
+
+def test_evaluator_reports_low_confidence_and_wrong_commit() -> None:
+    """Verify that independent deterministic failures are both reported."""
+
+    report = IncidentReport(
+        likely_cause="An unrelated commit caused the incident.",
+        evidence=["Supporting evidence."],
+        confidence=0.5,
+        suggested_remediation="Apply the appropriate remediation.",
+    )
+
+    failures = evaluate_incident_report(
+        report=report,
+        expectation=INCIDENT_004_EXPECTATION,
+    )
+
+    assert len(failures) == 2
+    assert any("confidence" in failure.lower() for failure in failures)
+    assert any("introducing commit" in failure.lower() for failure in failures)

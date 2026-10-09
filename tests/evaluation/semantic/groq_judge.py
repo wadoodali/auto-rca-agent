@@ -1,13 +1,38 @@
 import os
+import json
 from typing import Any
 
 from deepeval.models.base_model import DeepEvalBaseLLM
-from openai import AsyncOpenAI, OpenAI, RateLimitError
-from pydantic import BaseModel
+from openai import (
+    APIConnectionError,
+    APIError,
+    APITimeoutError,
+    AsyncOpenAI,
+    AuthenticationError,
+    InternalServerError,
+    OpenAI,
+    OpenAIError,
+    PermissionDeniedError,
+    RateLimitError,
+)
+from pydantic import BaseModel, ValidationError
 
 
 class JudgeUnavailableError(RuntimeError):
     """Raised when the external evaluation judge cannot be used."""
+
+
+class JudgeConfigurationError(RuntimeError):
+    """Raised when the external evaluation judge is misconfigured."""
+
+
+class JudgeProviderError(RuntimeError):
+    """Raised for non-availability provider failures."""
+
+
+class JudgeResponseError(RuntimeError):
+    """Raised when the judge returns an unusable response."""
+
 
 class GroqJudge(DeepEvalBaseLLM):
     """DeepEval judge backed by Groq's OpenAI-compatible API."""
@@ -24,7 +49,7 @@ class GroqJudge(DeepEvalBaseLLM):
 
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-            raise ValueError(
+            raise JudgeConfigurationError(
                 "GROQ_API_KEY environment variable is not set."
             )
 
@@ -32,36 +57,45 @@ class GroqJudge(DeepEvalBaseLLM):
         self.temperature = temperature
         self.call_count = 0
 
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url=self.BASE_URL,
-        )
+        try:
+            self.client = OpenAI(
+                api_key=api_key,
+                base_url=self.BASE_URL,
+            )
 
-        self.async_client = AsyncOpenAI(
-            api_key=api_key,
-            base_url=self.BASE_URL,
-        )
+            self.async_client = AsyncOpenAI(
+                api_key=api_key,
+                base_url=self.BASE_URL,
+            )
+        except OpenAIError as error:
+            self._handle_provider_error(error)
 
-    def _handle_rate_limit(self, error: RateLimitError) -> None:
-        """Handle Groq rate-limit and quota errors explicitly."""
+    def _handle_provider_error(self, error: OpenAIError) -> None:
+        """Classify expected Groq provider failures without exposing details."""
 
-        response = error.response
-        body = error.body
-
-        error_message = str(body).lower()
-
-        if "tokens per day" in error_message or "tpd" in error_message:
+        if isinstance(error, RateLimitError):
             raise JudgeUnavailableError(
-                "Groq judge token quota has been exhausted. "
-                "The semantic evaluation cannot continue until the "
-                "provider quota resets."
-            ) from error
+                "Groq judge rate limit or quota is unavailable."
+            ) from None
 
-        raise JudgeUnavailableError(
-            f"Groq judge rate limit encountered. "
-            f"HTTP status: {response.status_code}. "
-            f"Provider response: {body}"
-        ) from error
+        if isinstance(error, (APIConnectionError, APITimeoutError, InternalServerError)):
+            raise JudgeUnavailableError(
+                "Groq judge provider is temporarily unavailable."
+            ) from None
+
+        if isinstance(error, (AuthenticationError, PermissionDeniedError)):
+            raise JudgeConfigurationError(
+                "Groq judge authentication or permission configuration is invalid."
+            ) from None
+
+        if isinstance(error, APIError):
+            raise JudgeProviderError(
+                "Groq judge returned an unexpected provider error."
+            ) from None
+
+        raise JudgeProviderError(
+            "Groq judge request failed."
+        ) from None
 
     def load_model(self) -> OpenAI:
         """Return the synchronous Groq client."""
@@ -89,19 +123,29 @@ class GroqJudge(DeepEvalBaseLLM):
                 if schema
                 else None,
             )
-        except RateLimitError as error:
-            self._handle_rate_limit(error)
+        except OpenAIError as error:
+            self._handle_provider_error(error)
 
         self.call_count += 1
         print(f"\n[GroqJudge] Call #{self.call_count}")
 
-        content = response.choices[0].message.content
+        try:
+            content = response.choices[0].message.content
+        except (AttributeError, IndexError, TypeError) as error:
+            raise JudgeResponseError(
+                "Groq judge returned an invalid response."
+            ) from None
 
         if content is None:
-            raise ValueError("Groq returned an empty response.")
+            raise JudgeResponseError("Groq judge returned an empty response.") from None
 
         if schema:
-            return schema.model_validate_json(content)
+            try:
+                return schema.model_validate_json(content)
+            except (ValidationError, ValueError, json.JSONDecodeError) as error:
+                raise JudgeResponseError(
+                    "Groq judge returned invalid structured output."
+                ) from None
 
         return content
 
@@ -126,19 +170,29 @@ class GroqJudge(DeepEvalBaseLLM):
                 if schema
                 else None,
             )
-        except RateLimitError as error:
-            self._handle_rate_limit(error)
+        except OpenAIError as error:
+            self._handle_provider_error(error)
 
         self.call_count += 1
         print(f"\n[GroqJudge] Call #{self.call_count}")
 
-        content = response.choices[0].message.content
+        try:
+            content = response.choices[0].message.content
+        except (AttributeError, IndexError, TypeError) as error:
+            raise JudgeResponseError(
+                "Groq judge returned an invalid response."
+            ) from None
 
         if content is None:
-            raise ValueError("Groq returned an empty response.")
+            raise JudgeResponseError("Groq judge returned an empty response.") from None
 
         if schema:
-            return schema.model_validate_json(content)
+            try:
+                return schema.model_validate_json(content)
+            except (ValidationError, ValueError, json.JSONDecodeError) as error:
+                raise JudgeResponseError(
+                    "Groq judge returned invalid structured output."
+                ) from None
 
         return content
 

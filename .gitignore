@@ -14,3 +14,4 @@ __pycache__/
 
 # Local ChromaDB data
 data/chroma/
+data/chroma-phase82/

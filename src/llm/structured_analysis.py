@@ -1,3 +1,4 @@
+from src.config import get_config
 from src.llm.client import create_openai_client
 from src.schemas.incident import IncidentReport
 
@@ -5,8 +6,9 @@ def investigate_incident() -> IncidentReport:
     """Generate a structured incident report from a simple test incident."""
 
     client = create_openai_client()
+    config = get_config()
     response = client.responses.parse(
-        model="gpt-5.6-luna",
+        model=config.openai_model,
         input=[
             {
                 "role": "system",

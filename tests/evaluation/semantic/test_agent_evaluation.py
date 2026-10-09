@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 from dotenv import load_dotenv
@@ -20,20 +21,16 @@ from tests.evaluation.deterministic.expected_incidents import (
 )
 from tests.evaluation.semantic.groq_judge import (
     GroqJudge,
+    JudgeConfigurationError,
     JudgeUnavailableError,
 )
 from tests.evaluation.semantic.trajectory_evaluator import (
+    create_judge_model,
     evaluate_investigation_trajectory,
 )
 
 
 load_dotenv()
-
-
-JUDGE_MODEL = GroqJudge(
-    model="openai/gpt-oss-120b",
-    temperature=0.0,
-)
 
 
 def build_deepeval_tool_calls(
@@ -49,6 +46,19 @@ def build_deepeval_tool_calls(
         )
         for step in execution_trace
     ]
+
+
+def get_judge_model_for_evaluation() -> GroqJudge:
+    """Create the judge, skipping locally but failing clearly in CI."""
+
+    try:
+        return create_judge_model()
+    except JudgeConfigurationError as error:
+        if os.getenv("GITHUB_ACTIONS", "").lower() == "true":
+            pytest.fail(
+                f"Semantic evaluation is misconfigured: {error}"
+            )
+        pytest.skip(f"Semantic judge unavailable locally: {error}")
 
 
 @pytest.mark.parametrize(
@@ -173,13 +183,15 @@ def test_agent_investigation_is_faithful(
     # itself as failed.
     # ---------------------------------------------------------
 
+    judge_model = get_judge_model_for_evaluation()
+
     try:
         # -----------------------------------------------------
         # 3a. Faithfulness evaluation
         # -----------------------------------------------------
 
         faithfulness_metric = FaithfulnessMetric(
-            model=JUDGE_MODEL,
+            model=judge_model,
             threshold=0.7,
             include_reason=False,
         )
@@ -215,16 +227,12 @@ def test_agent_investigation_is_faithful(
 
         trajectory_metric = evaluate_investigation_trajectory(
             trajectory_test_case,
+            judge_model=judge_model,
         )
 
         print(
             f"\nTrajectory score: "
             f"{trajectory_metric.score:.3f}"
-        )
-
-        print(
-            f"Trajectory reason: "
-            f"{trajectory_metric.reason}"
         )
 
         assert trajectory_metric.is_successful(), (
@@ -242,8 +250,8 @@ def test_agent_investigation_is_faithful(
     # 4. Display useful evaluation information
     # ---------------------------------------------------------
 
-    print(f"\nIncident: {incident_id}")
-    print(f"Likely cause: {report.likely_cause}")
-    print(f"Confidence: {report.confidence}")
-    print(f"Evidence: {report.evidence}")
-    print(f"Tools called: {len(tools_called)}")
+    print(
+        f"\nIncident: {incident_id}; "
+        f"confidence: {report.confidence}; "
+        f"tools called: {len(tools_called)}"
+    )

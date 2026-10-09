@@ -38,7 +38,6 @@ def retrieve_evidence(
     evidence = [
         RetrievedEvidence(
             **result,
-            incident_id=incident_id,
         )
         for result in results
     ]

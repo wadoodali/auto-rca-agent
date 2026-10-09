@@ -11,6 +11,7 @@ class FakeCollection:
         """Return controlled evidence without calling an embedding service."""
 
         return {
+            "ids": [["log-001", "log-002"]],
             "documents": [[
                 "Database connection pool reached 100%.",
                 "Database connection pool reached 92%.",
@@ -49,6 +50,23 @@ def test_retrieve_logs_returns_incident_evidence() -> None:
         result.incident_id == "INC-2026-001"
         for result in results
     )
+    assert [result.distance for result in results] == [0.12, 0.35]
+
+
+def test_retrieve_logs_with_no_distance_limit_retains_all_valid_results() -> None:
+    config = RetrievalConfig(
+        n_results=5,
+        max_distance=None,
+    )
+
+    results = retrieve_logs(
+        incident_id="INC-2026-001",
+        query="database connection pool exhaustion",
+        config=config,
+        collection=FakeCollection(),
+    )
+
+    assert len(results) == 2
 
 
 def test_retrieve_logs_respects_max_distance() -> None:

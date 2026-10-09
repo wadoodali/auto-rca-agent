@@ -5,16 +5,23 @@ from deepeval.test_case import LLMTestCase, SingleTurnParams
 from tests.evaluation.semantic.groq_judge import GroqJudge
 
 
-JUDGE_MODEL = GroqJudge(
-    model="openai/gpt-oss-120b",
-    temperature=0.0,
-)
+def create_judge_model() -> GroqJudge:
+    """Create the trajectory judge only when semantic evaluation runs."""
+
+    return GroqJudge(
+        model="openai/gpt-oss-120b",
+        temperature=0.0,
+    )
 
 
 def evaluate_investigation_trajectory(
     test_case: LLMTestCase,
+    judge_model: GroqJudge | None = None,
 ) -> GEval:
     """Evaluate the quality of an RCA agent's investigation trajectory."""
+
+    if judge_model is None:
+        judge_model = create_judge_model()
 
     metric = GEval(
         name="RCA Trajectory Quality",
@@ -75,7 +82,7 @@ def evaluate_investigation_trajectory(
                 ),
             ),
         ],
-        model=JUDGE_MODEL,
+        model=judge_model,
         threshold=0.7,
     )
 
