@@ -106,6 +106,30 @@ npm run dev
 
 Open the application at <http://localhost:5173>. The FastAPI documentation is available at <http://localhost:8000/docs>. Investigations use external OpenAI services and may incur API costs.
 
+## Run with Docker Compose
+
+Docker and Docker Compose are required for the containerized deployment. Configure the root `.env` file with `OPENAI_API_KEY`; the key is used for embeddings during seeding and for investigations. Do not commit `.env`.
+
+From the repository root, build the images and start the services:
+
+```powershell
+docker compose up --build
+```
+
+Open the application at <http://localhost:8080>. FastAPI documentation is available through the frontend proxy at <http://localhost:8080/docs>. The backend is available only on the internal Compose network and is not published directly to the host.
+
+ChromaDB is stored in the named `chroma_data` volume mounted at `/app/data/chroma`. Stop the services without deleting the evidence volume with:
+
+```powershell
+docker compose down
+```
+
+Restart them with `docker compose up`. To rebuild the images after deployment changes, run `docker compose build` or use `docker compose up --build`.
+
+The `chroma_seed` service runs the existing upsert-based seed operation before the backend starts. Re-running it updates matching documents but does not remove stale records when source documents are deleted or reorganized. Removing the named volume is a destructive operation and requires reseeding; do not use `docker compose down -v` unless that reset is intentional.
+
+GitHub Actions builds both images for pull requests and publishes images to GitHub Container Registry on pushes to `master` and version tags beginning with `v`. Publication uses `GITHUB_TOKEN`; the repository's Actions settings and package permissions must allow publishing. GHCR packages are private by default, so enable public visibility in the package settings if anonymous pulls are required.
+
 ## Run one investigation
 
 Configure `OPENAI_API_KEY`, seed ChromaDB, and set `CHROMA_PATH` to the intended store before running an investigation from the repository root:
