@@ -64,6 +64,38 @@ The default persistent path is `data/chroma` and the collection name is `inciden
 
 If `OPENAI_EMBEDDING_MODEL` changes, the existing vector store must be compatible with that model. For a model change, clear the configured Chroma path and reseed it before retrieving evidence. The local Chroma data directory is ignored by Git and is not supplied by a fresh checkout.
 
+## Run the Web Application
+
+Prerequisites:
+
+- Python 3.14
+- Node.js 22 and npm
+- The pinned Python dependencies from `requirements.txt`
+
+Configure the root `.env` file with your `OPENAI_API_KEY`. `GROQ_API_KEY` is only needed when running semantic evaluation; it is not required to run the web application.
+
+From the repository root, seed the local ChromaDB store:
+
+```powershell
+python scripts/seed_samples.py
+```
+
+In one PowerShell terminal, start the backend from the repository root:
+
+```powershell
+python -m uvicorn src.api.app:app --reload
+```
+
+Open a second PowerShell terminal, navigate to the frontend, and start the React/Vite development server:
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Open the application at <http://localhost:5173>. The FastAPI documentation is available at <http://localhost:8000/docs>. Investigations use external OpenAI services and may incur API costs.
+
 ## Run one investigation
 
 Configure `OPENAI_API_KEY`, seed ChromaDB, and set `CHROMA_PATH` to the intended store before running an investigation from the repository root:
