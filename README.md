@@ -1,6 +1,16 @@
 # AI Incident Investigator
 
+[![CI](https://github.com/wadoodali/auto-rca-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/wadoodali/auto-rca-agent/actions/workflows/ci.yml)
+
+![AI Incident Investigator dashboard](docs/images/dashboard.png)
+
 AI Incident Investigator is an autonomous incident root-cause analysis agent. It uses an OpenAI model with tool calling, retrieves incident evidence from a ChromaDB-backed RAG store, and returns structured Pydantic reports. The repository also contains deterministic evaluation and an optional semantic evaluation using DeepEval and an independent Groq judge.
+
+## Example Investigation
+
+![Example investigation result](docs/images/investigation-result.png)
+
+The investigation result presents the model-reported likely cause and confidence, supporting evidence, and suggested remediation. The confidence is reported by the model and is not a calibrated probability.
 
 ## Architecture
 
