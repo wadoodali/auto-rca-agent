@@ -4,159 +4,70 @@
 
 ![AI Incident Investigator dashboard](docs/images/dashboard.png)
 
-AI Incident Investigator is an autonomous incident root-cause analysis agent. It uses an OpenAI model with tool calling, retrieves incident evidence from a ChromaDB-backed RAG store, and returns structured Pydantic reports. The repository also contains deterministic evaluation and an optional semantic evaluation using DeepEval and an independent Groq judge.
+AI Incident Investigator is a portfolio prototype that uses a tool-using OpenAI agent and ChromaDB-backed retrieval to turn incident evidence into a structured root-cause analysis report.
 
-## Example Investigation
+It is designed to make incident investigation traceable: the agent searches logs, Git commits, and deployment evidence, then returns a validated report with supporting context and an execution trace. It is an engineering project for evaluation and demonstration, not a production-proven commercial system.
+
+## Key capabilities
+
+- RAG over incident logs, Git commit records, and deployment records stored in ChromaDB.
+- OpenAI Responses API agent with explicit tool schemas and guarded tool execution.
+- Incident-scoped retrieval with source-type filters for logs, commits, and deployments.
+- Pydantic-validated RCA reports containing a likely cause, evidence, model-reported confidence, and suggested remediation.
+- FastAPI endpoints and a React/Vite interface with Investigate and About routes.
+- Deterministic report checks, optional provider-backed semantic evaluation, and unit tests for API, agent, tools, validation, and retrieval behavior.
+- Docker Compose deployment with a seeded persistent ChromaDB volume, Nginx frontend proxying, GHCR image workflows, and a manual smoke test for published images.
+
+## Example investigation
 
 ![Example investigation result](docs/images/investigation-result.png)
 
-The investigation result presents the model-reported likely cause and confidence, supporting evidence, and suggested remediation. The confidence is reported by the model and is not a calibrated probability.
+The report view presents the model-reported likely cause, supporting evidence, confidence, and suggested remediation. Confidence is constrained by the report schema to a value from 0.0 to 1.0, but it is model-reported and should not be interpreted as a calibrated probability.
 
 ## Architecture
 
-- `src/agent/` contains the autonomous investigation loop.
-- `src/tools/` contains tool definitions, adapters, execution, and incident-evidence tools.
-- `src/rag/` contains document ingestion, ChromaDB storage, and retrieval.
-- `src/llm/` contains OpenAI client and structured-analysis integration.
-- `src/schemas/` contains structured incident-report models.
-- `tests/unit/` contains offline unit tests.
-- `tests/evaluation/deterministic/` contains deterministic report checks.
-- `tests/evaluation/semantic/` contains optional provider-backed semantic checks.
+```mermaid
+flowchart LR
+    Local[React/Vite] -->|HTTP localhost:8000| API[FastAPI]
+    Docker[React frontend] -->|same-origin /api/| Nginx[Nginx]
+    Nginx -->|/api/ proxy| API
 
-Run project commands from the repository root. Relative paths for `samples/` and the default ChromaDB location currently depend on that working directory.
+    API -->|investigation request| Agent[OpenAI Responses agent]
+    Agent --> Tools[Evidence tools]
+    Tools --> RAG[RAG retrieval]
+    RAG -->|query| Chroma[(Persistent ChromaDB)]
+    Chroma -->|retrieved evidence| RAG
+    RAG -->|evidence| Agent
+    Agent --> Result[Pydantic InvestigationResult]
+    Result --> API
 
-## Requirements
-
-- Python 3.14 (the version used by the repository's GitHub Actions workflows).
-- A PowerShell terminal on Windows for the setup commands below.
-- The pinned dependencies in `requirements.txt`.
-
-## Local setup
-
-From the repository root, create and activate a virtual environment:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+    Samples[Sample incident files] --> Seed[scripts/seed_samples.py]
+    Seed --> Chroma
 ```
 
-Install the pinned dependencies:
+The main implementation areas are:
 
-```powershell
-python -m pip install -r requirements.txt
-```
+- [`src/api/`](src/api/) validates requests and exposes the incident and investigation endpoints.
+- [`src/agent/`](src/agent/) manages the Responses API loop, tool calls, duplicate-call protection, and execution traces.
+- [`src/tools/`](src/tools/) defines and executes log, Git commit, and deployment evidence tools.
+- [`src/rag/`](src/rag/) ingests documents, persists the ChromaDB collection, and applies retrieval filters.
+- [`src/schemas/`](src/schemas/) defines the structured incident report and complete investigation result.
+- [`frontend/src/`](frontend/src/) contains the React interface and API client.
 
-If PowerShell execution-policy settings prevent activation, use an approved local policy or invoke the environment's Python directly.
+## Technology stack
 
-## Environment variables
+| Area | Technologies |
+| --- | --- |
+| Backend | Python 3.14, FastAPI, Uvicorn, Pydantic |
+| Agent and providers | OpenAI Responses API, OpenAI embeddings, DeepEval, independent Groq judge for semantic evaluation |
+| Retrieval | ChromaDB, persistent local collection, metadata-filtered search |
+| Frontend | React, Vite, JavaScript, native CSS |
+| Deployment | Docker, Docker Compose, Nginx, GitHub Actions, GitHub Container Registry |
+| Quality checks | pytest, deterministic evaluation, semantic evaluation, container smoke testing |
 
-Create a `.env` file in the repository root. Do not commit it; `.env` is ignored by Git. Never place real credentials in source code or documentation.
+## Evaluation and engineering quality
 
-```dotenv
-OPENAI_API_KEY=your-openai-api-key
-OPENAI_MODEL=gpt-5.6-luna
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small
-CHROMA_PATH=data/chroma
-GROQ_API_KEY=your-groq-api-key
-```
-
-`OPENAI_API_KEY` is required when OpenAI functionality is used. `GROQ_API_KEY` is required for semantic evaluation. The other values have the defaults shown above and can be overridden for a runtime environment.
-
-## Seed ChromaDB
-
-Seed the sample incidents and initialize the configured persistent ChromaDB collection from the repository root:
-
-```powershell
-python scripts/seed_samples.py
-```
-
-The default persistent path is `data/chroma` and the collection name is `incident_evidence`. Seeding uses the configured OpenAI embedding model and therefore requires `OPENAI_API_KEY` and provider access.
-
-If `OPENAI_EMBEDDING_MODEL` changes, the existing vector store must be compatible with that model. For a model change, clear the configured Chroma path and reseed it before retrieving evidence. The local Chroma data directory is ignored by Git and is not supplied by a fresh checkout.
-
-## Run the Web Application
-
-Prerequisites:
-
-- Python 3.14
-- Node.js 22 and npm
-- The pinned Python dependencies from `requirements.txt`
-
-Configure the root `.env` file with your `OPENAI_API_KEY`. `GROQ_API_KEY` is only needed when running semantic evaluation; it is not required to run the web application.
-
-From the repository root, seed the local ChromaDB store:
-
-```powershell
-python scripts/seed_samples.py
-```
-
-In one PowerShell terminal, start the backend from the repository root:
-
-```powershell
-python -m uvicorn src.api.app:app --reload
-```
-
-Open a second PowerShell terminal, navigate to the frontend, and start the React/Vite development server:
-
-```powershell
-cd frontend
-npm ci
-npm run dev
-```
-
-Open the application at <http://localhost:5173>. The FastAPI documentation is available at <http://localhost:8000/docs>. Investigations use external OpenAI services and may incur API costs.
-
-## Run with Docker Compose
-
-Docker and Docker Compose are required for the containerized deployment. Configure the root `.env` file with `OPENAI_API_KEY`; the key is used for embeddings during seeding and for investigations. Do not commit `.env`.
-
-From the repository root, build the images and start the services:
-
-```powershell
-docker compose up --build
-```
-
-Open the application at <http://localhost:8080>. FastAPI documentation is available through the frontend proxy at <http://localhost:8080/docs>. The backend is available only on the internal Compose network and is not published directly to the host.
-
-ChromaDB is stored in the named `chroma_data` volume mounted at `/app/data/chroma`. Stop the services without deleting the evidence volume with:
-
-```powershell
-docker compose down
-```
-
-Restart them with `docker compose up`. To rebuild the images after deployment changes, run `docker compose build` or use `docker compose up --build`.
-
-The `chroma_seed` service runs the existing upsert-based seed operation before the backend starts. Re-running it updates matching documents but does not remove stale records when source documents are deleted or reorganized. Removing the named volume is a destructive operation and requires reseeding; do not use `docker compose down -v` unless that reset is intentional.
-
-GitHub Actions builds both images for pull requests and publishes images to GitHub Container Registry on pushes to `master` and version tags beginning with `v`. Publication uses `GITHUB_TOKEN`; the repository's Actions settings and package permissions must allow publishing. GHCR packages are private by default, so enable public visibility in the package settings if anonymous pulls are required.
-
-## Run one investigation
-
-Configure `OPENAI_API_KEY`, seed ChromaDB, and set `CHROMA_PATH` to the intended store before running an investigation from the repository root:
-
-```python
-from src.agent.rca_agent import run_investigation
-
-result = run_investigation(
-    incident_id="INC-2026-001",
-    investigation_query=(
-        "Analyze the incident and identify the likely root cause "
-        "using the available logs, commits, and deployment evidence."
-    ),
-)
-
-print("Likely cause:", result.report.likely_cause)
-print("Confidence:", result.report.confidence)
-print("Suggested remediation:", result.report.suggested_remediation)
-print("Retrieved evidence:", len(result.retrieved_context))
-print("Tool calls:", len(result.execution_trace))
-```
-
-The investigation uses OpenAI and may incur API costs. The example prints structured report fields and summary counts without dumping the full execution trace or retrieved evidence.
-
-## Tests and evaluations
-
-Run the offline unit suite:
+Run the offline unit suite from the repository root:
 
 ```powershell
 python scripts/run_evaluation.py unit
@@ -168,12 +79,144 @@ Run the deterministic evaluation:
 python scripts/run_evaluation.py deterministic
 ```
 
-These suites do not require the semantic Groq judge. The deterministic suite checks configured ground-truth properties such as confidence and introducing commits.
+Run both fast suites together:
 
-Semantic evaluation is intentionally separate and is only run manually:
+```powershell
+python scripts/run_evaluation.py all
+```
+
+The unit suite covers API validation and error boundaries, provider-error sanitization, tool execution, agent trace behavior, report schemas, retrieval filtering, and vector-store response validation. The deterministic suite checks incident-specific report properties such as confidence thresholds and introducing commits.
+
+Semantic evaluation is intentionally separate and requires both `OPENAI_API_KEY` and `GROQ_API_KEY`:
 
 ```powershell
 python -m pytest tests/evaluation/semantic -q
 ```
 
-Before running it, seed ChromaDB and provide both `OPENAI_API_KEY` and `GROQ_API_KEY`. Semantic evaluation calls external OpenAI and Groq-backed services and may incur API usage costs. It is not part of normal CI; GitHub Actions exposes it through the manually triggered semantic-evaluation workflow.
+It uses external OpenAI and Groq-backed services and may incur API costs. Seed ChromaDB first when running it. The semantic evaluation workflow is manually triggered; it is not part of every push.
+
+The GitHub Actions workflows provide these gates:
+
+- `ci.yml` runs unit tests on pushes and pull requests targeting `master`; deterministic evaluation runs after unit tests, and the frontend runs `npm ci` plus `npm run build` in its own job.
+- `semantic-evaluation.yml` runs provider-backed semantic checks only through `workflow_dispatch` and validates its API credentials first.
+- `docker.yml` validates Compose configuration and builds backend/frontend images on pull requests and pushes. GHCR publication is limited to pushes to `master` and version tags beginning with `v`.
+- `docker-smoke-test.yml` is manually triggered and checks the published commit-specific images through frontend delivery, SPA routing, FastAPI documentation, API routing, and the six sample incident IDs. The workflow files describe these checks; a local checkout does not prove that a particular remote run succeeded.
+
+## Quick start: local development
+
+Run commands from the repository root. Relative paths for `samples/` and the default ChromaDB location depend on that working directory.
+
+### Prerequisites
+
+- Python 3.14
+- Node.js 22 and npm
+- The pinned Python dependencies in `requirements.txt`
+
+Create and activate a virtual environment in PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+Create a root `.env` file with at least:
+
+```dotenv
+OPENAI_API_KEY=your-openai-api-key
+```
+
+Optional settings include `OPENAI_MODEL`, `OPENAI_EMBEDDING_MODEL`, and `CHROMA_PATH`. `GROQ_API_KEY` is only needed for semantic evaluation. Never commit real credentials.
+
+### Seed evidence and run the web application
+
+Seed the six sample incidents and initialize the persistent `incident_evidence` collection:
+
+```powershell
+python scripts/seed_samples.py
+```
+
+Seeding uses OpenAI embeddings and may incur API costs. In one terminal, start FastAPI from the repository root:
+
+```powershell
+python -m uvicorn src.api.app:app --reload
+```
+
+In a second terminal:
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Open the frontend at <http://localhost:5173>. FastAPI documentation is at <http://localhost:8000/docs>. Investigations use external OpenAI services and may incur API costs.
+
+## Quick start: Docker Compose
+
+Docker and Docker Compose are required for the containerized deployment. Configure the root `.env` with `OPENAI_API_KEY`; it is used for seeding embeddings and investigations.
+
+From the repository root:
+
+```powershell
+docker compose up --build
+```
+
+Open the frontend at <http://localhost:8080>. FastAPI documentation is proxied at <http://localhost:8080/docs>; the backend port is internal to the Compose network.
+
+ChromaDB persists in the named `chroma_data` volume mounted at `/app/data/chroma`. Stop and restart without deleting the evidence volume:
+
+```powershell
+docker compose down
+docker compose up
+```
+
+Rebuild after deployment changes with `docker compose build` or `docker compose up --build`. The `chroma_seed` service runs the existing upsert-based seed operation before the backend. Re-running it updates matching IDs but does not remove stale records when source documents are deleted or reorganized. `docker compose down -v` deletes the named volume and requires reseeding; use it only when that reset is intentional.
+
+## Repository structure
+
+```text
+.
+├── src/
+│   ├── api/                    # FastAPI routes and request models
+│   ├── agent/                  # OpenAI investigation loop and traces
+│   ├── rag/                    # Ingestion, ChromaDB, and retrieval
+│   ├── schemas/                # Pydantic incident-report models
+│   └── tools/                  # Tool definitions, execution, and evidence tools
+├── frontend/
+│   ├── src/                    # React application and API client
+│   ├── Dockerfile.frontend     # Node build stage and Nginx runtime image
+│   └── nginx.conf              # SPA fallback and backend proxy
+├── samples/                    # Six sample incident evidence sets
+├── scripts/
+│   ├── seed_samples.py         # ChromaDB sample seeding
+│   └── run_evaluation.py       # Unit/deterministic/semantic dispatcher
+├── tests/
+│   ├── unit/
+│   └── evaluation/
+├── Dockerfile.backend
+├── compose.yaml
+└── requirements.txt
+```
+
+## Limitations and future improvements
+
+Current limitations:
+
+- Investigations and embedding generation depend on external OpenAI services, credentials, network access, and API budget.
+- Model-reported confidence is not calibrated uncertainty.
+- The current seed operation uses `upsert()` and does not reconcile records removed from the source samples.
+- Semantic evaluation depends on external providers and is manual rather than part of normal CI.
+- There is no hosted demo; run the application through local development or Docker Compose. GitHub Actions builds and publishes the images and smoke-tests published images, but does not host a persistent running application.
+
+Possible future improvements:
+
+- Add explicit readiness and health endpoints for deployment orchestration.
+- Add a documented rebuild/reconciliation path for stale ChromaDB records.
+- Add provider-independent or recorded evaluation fixtures for lower-cost regression checks.
+
+These are proposed improvements, not capabilities currently implemented by the repository.
+
+## Explore the project
+
+Browse the source and workflows on [GitHub](https://github.com/wadoodali/auto-rca-agent). The README, evaluation suites, container definitions, and CI workflows are intended to make the engineering decisions easy to inspect.
