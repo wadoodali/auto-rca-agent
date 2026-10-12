@@ -1,0 +1,89 @@
+name: Docker Smoke Test
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  smoke_test:
+    name: Smoke Test Published Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull published images and check endpoints
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          backend_image="ghcr.io/wadoodali/auto-rca-agent/backend:sha-8e079e8"
+          frontend_image="ghcr.io/wadoodali/auto-rca-agent/frontend:sha-8e079e8"
+          network_name="docker-smoke-${GITHUB_RUN_ID}"
+
+          cleanup() {
+            docker rm -f backend frontend >/dev/null 2>&1 || true
+            docker network rm "$network_name" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker pull "$backend_image"
+          docker pull "$frontend_image"
+          docker network create "$network_name"
+
+          docker run -d \
+            --name backend \
+            --network "$network_name" \
+            "$backend_image"
+
+          docker run -d \
+            --name frontend \
+            --network "$network_name" \
+            --publish 8080:80 \
+            "$frontend_image"
+
+          wait_for_endpoint() {
+            local url="$1"
+            local attempt
+            for attempt in $(seq 1 30); do
+              if curl --fail --silent --show-error \
+                --connect-timeout 2 \
+                --max-time 5 \
+                "$url" >/dev/null; then
+                return 0
+              fi
+              sleep 2
+            done
+            echo "Timed out waiting for $url" >&2
+            return 1
+          }
+
+          wait_for_endpoint "http://localhost:8080/"
+          wait_for_endpoint "http://localhost:8080/about"
+          wait_for_endpoint "http://localhost:8080/docs"
+          wait_for_endpoint "http://localhost:8080/openapi.json"
+          wait_for_endpoint "http://localhost:8080/api/incidents"
+
+          incidents_json="$(curl --fail --silent --show-error \
+            --connect-timeout 2 \
+            --max-time 5 \
+            http://localhost:8080/api/incidents)"
+
+          printf '%s' "$incidents_json" | python -c '
+          import json
+          import sys
+
+          payload = json.load(sys.stdin)
+          expected = {f"INC-2026-{number:03d}" for number in range(1, 7)}
+          if not isinstance(payload, list):
+              raise SystemExit("/api/incidents did not return a JSON array")
+          actual = {
+              item.get("incident_id")
+              for item in payload
+              if isinstance(item, dict)
+          }
+          if actual != expected:
+              raise SystemExit(
+                  f"Unexpected incident IDs: {sorted(actual)}"
+              )
+          print("/api/incidents returned all six expected incident IDs")
+          '
