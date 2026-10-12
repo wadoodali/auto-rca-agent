@@ -245,6 +245,35 @@ def test_enriched_trace_is_compatible_with_investigation_result() -> None:
     assert result.execution_trace == trace
 
 
+def test_retrieved_context_serializes_evidence_as_json() -> None:
+    evidence = {
+        "content": "Connection pool exhausted",
+        "source_type": "log",
+        "incident_id": "INC-2026-001",
+        "source_id": "log-1",
+        "distance": 0.42,
+    }
+
+    context = rca_agent.build_retrieved_context([
+        (tool_call("fetch_incident_logs", "{}"), [evidence]),
+    ])
+
+    assert isinstance(context, list)
+    assert all(isinstance(item, str) for item in context)
+    assert json.loads(context[0]) == evidence
+
+
+def test_retrieved_context_falls_back_without_discarding_unserializable_evidence() -> None:
+    evidence: dict[str, object] = {"content": object()}
+
+    context = rca_agent.build_retrieved_context([
+        (tool_call("fetch_incident_logs", "{}"), [evidence]),
+    ])
+
+    assert len(context) == 1
+    assert "content" in context[0]
+
+
 def test_exact_duplicate_does_not_execute_twice_and_returns_error() -> None:
     seen: set[tuple[str, str]] = set()
     calls = [

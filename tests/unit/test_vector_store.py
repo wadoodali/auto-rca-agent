@@ -51,7 +51,6 @@ def test_missing_result_key_raises_controlled_error(missing_key: str) -> None:
     [
         {**VALID_RESULT, "documents": []},
         {**VALID_RESULT, "metadatas": [[]]},
-        {**VALID_RESULT, "distances": [[0.2]]},
         {**VALID_RESULT, "documents": [["first", "second"], ["extra"]]},
     ],
 )

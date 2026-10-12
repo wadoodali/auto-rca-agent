@@ -14,10 +14,10 @@ def create_embedding_function() -> OpenAIEmbeddingFunction:
     """Create the OpenAI embedding function used by ChromaDB."""
 
     config = get_config()
-    api_key = require_openai_api_key(config)
+    require_openai_api_key(config)
     return OpenAIEmbeddingFunction(
         model_name=config.openai_embedding_model,
-        api_key=api_key,
+        api_key_env_var="OPENAI_API_KEY",
     )
 
 def create_vector_store() -> chromadb.Collection:

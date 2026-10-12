@@ -1,5 +1,3 @@
-from typing import Any
-
 import chromadb
 
 from src.rag.vector_store import create_vector_store, search_documents

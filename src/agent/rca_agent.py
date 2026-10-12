@@ -204,11 +204,15 @@ def build_execution_trace(
 def build_retrieved_context(tool_results: list[tuple[Any, list[dict[str, Any]]]]) -> list[str]:
     """Extract retrieved evidence from executed tool results."""
 
-    return [
-        str(evidence)
-        for _, results in tool_results
-        for evidence in results
-    ]
+    serialized_context: list[str] = []
+    for _, results in tool_results:
+        for evidence in results:
+            try:
+                serialized_context.append(json.dumps(evidence, ensure_ascii=False))
+            except (TypeError, ValueError):
+                serialized_context.append(str(evidence))
+
+    return serialized_context
 
 MAX_INVESTIGATION_ROUNDS = 5
 def run_investigation(incident_id: str, investigation_query: str) -> InvestigationResult:
